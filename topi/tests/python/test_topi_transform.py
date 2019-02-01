@@ -304,6 +304,26 @@ def verify_gather_nd(src_shape, indices_src, indices_dtype):
     for device in get_all_backend():
         check_device(device)
 
+def verify_arange(start, stop, step, repeat, dtype):
+    A = topi.arange(start, stop, step, repeat, dtype)
+
+    def check_device(device):
+        ctx = tvm.context(device, 0)
+        if not ctx.exist:
+            print("Skip because %s is not enabled" % device)
+            return
+        print("Running on target: %s" % device)
+        with tvm.target.create(device):
+            s = topi.generic.schedule_elemwise(A)
+        foo = tvm.build(s, [A], device, name="arange")
+        out_npy = np.repeat(np.arange(start, stop, step).astype(dtype), repeat)
+        out_nd = tvm.nd.empty(out_npy.shape, ctx=ctx, dtype=A.dtype)
+        foo(out_nd)
+        tvm.testing.assert_allclose(out_nd.asnumpy(), out_npy)
+
+    for device in get_all_backend():
+        check_device(device)
+
 def test_strided_slice():
     verify_strided_slice((3, 4, 3), [0, 0, 0], [4, -5, 4], [1, -1, 2])
     verify_strided_slice((3, 4, 3), [1, 1, 0], [4, 4, 3], [2, 1, 1])
@@ -407,6 +427,12 @@ def test_gather_nd():
         verify_gather_nd((2, 3, 4, 5), [[1, 0], [2, 1], [3, 2], [4, 2]],
                          indices_dtype)
 
+def test_arange():
+    verify_arange(1, 100, 3, 1, 'int32')
+    verify_arange(1.2, 10.3, 1.2, 2, 'float32')
+    verify_arange(1, -10, -2, 1, 'int32')
+    verify_arange(1, 100, 3, 10, 'float32')
+
 if __name__ == "__main__":
     test_strided_slice()
     test_concatenate()
@@ -419,3 +445,4 @@ if __name__ == "__main__":
     test_expand_like()
     test_take()
     test_gather_nd()
+    test_arange()

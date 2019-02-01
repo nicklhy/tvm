@@ -90,6 +90,19 @@ def ones_like(attrs, inputs, output_type, target):
 
 register_schedule("ones_like", schedule_broadcast)
 
+# arange
+@register_compute("arange")
+def arange(attrs, inputs, output_type, target):
+    assert len(inputs) == 0
+    return [
+        topi.arange(attrs.start, attrs.stop, attrs.step,
+                    attrs.repeat, attrs.dtype),
+    ]
+
+register_schedule("arange", schedule_broadcast)
+#  register_pattern("arange", OpPattern.ELEMWISE)
+
+
 # clip
 @register_compute("clip")
 def clip_compute(attrs, inputs, output_type, target):

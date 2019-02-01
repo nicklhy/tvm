@@ -808,6 +808,46 @@ RELAY_REGISTER_OP("ones")
 .set_support_level(3)
 .add_type_rel("InitOp", InitOpRel);
 
+Expr MakeArange(const IndexExpr &start,
+    const IndexExpr &stop, const IndexExpr &step,
+    const Integer &repeat, DataType dtype) {
+  auto attrs = make_node<ArangeAttrs>();
+  attrs->start = std::move(start);
+  attrs->stop = std::move(stop);
+  attrs->step = std::move(step);
+  attrs->repeat = std::move(repeat);
+  attrs->dtype = std::move(dtype);
+  static const Op& op = Op::Get("arange");
+  return CallNode::make(op, {}, Attrs(attrs), {});
+}
+
+TVM_REGISTER_API("relay.op._make.arange")
+.set_body([](const TVMArgs& args, TVMRetValue* rv) {
+    runtime::detail::unpack_call<Expr, 5>(MakeArange, args, rv);
+  });
+
+bool ArangeOpRel(const Array<Type>& types,
+    int num_inputs,
+    const Attrs& attrs,
+    const TypeReporter& reporter) {
+  CHECK_EQ(num_inputs, 0);
+  CHECK_EQ(types.size(), 1);
+  const ArangeAttrs *param = attrs.as<ArangeAttrs>();
+  Array<IndexExpr> oshape;
+  oshape.push_back((param->stop-param->start)/param->step*param->repeat);
+
+  reporter->Assign(types[0], TensorTypeNode::make(oshape, param->dtype));
+  return true;
+}
+
+RELAY_REGISTER_OP("arange")
+.describe(R"code(Fill array with evenly spaced values within a given interval.
+)code" TVM_ADD_FILELINE)
+.set_attrs_type_key("relay.attrs.ArangeOpAttrs")
+.set_num_inputs(0)
+.set_support_level(3)
+.add_type_rel("Arange", ArangeOpRel);
+
 bool FullLikeRel(const Array<Type>& types,
                  int num_inputs,
                  const Attrs& attrs,

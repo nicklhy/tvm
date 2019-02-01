@@ -557,6 +557,30 @@ def ones_like(data):
     return _make.ones_like(data)
 
 
+def arange(start=0, stop='None', step=1, repeat=1, dtype='float32'):
+    """Returns evenly spaced values within a given interval.
+
+    Parameters
+    ----------
+    start : relay.Expr
+        Start of interval.
+    stop : relay.Expr
+        End of interval.
+    step : relay.Expr
+        Spacing between values. The default step size is 1.
+    repeat : relay.Expr
+        Number of times to repeat each element. The default repeat count is 1.
+    dtype : data type
+        The data type of the output.
+
+    Returns
+    -------
+    result : relay.Expr
+        The computed result.
+    """
+    return _make.arange(start, stop, step, repeat, dtype)
+
+
 def clip(a, a_min, a_max):
     """Clip the elements in `a` between `a_min` and `a_max`.
     `a_min` and `a_max` are cast to `a`'s dtype.

@@ -193,5 +193,32 @@ inline Tensor full_like(const Tensor& x,
   }, name, tag);
 }
 
+/*!
+* \brief Creates an operation that fill a vector with
+*         evenly spaced values within a given interval
+*
+* \param start The start of interval
+* \param stop The end of interval
+* \param step The spacing between values
+* \param repeat number of times to repeat each element
+* \param dtype The type of the output tensor
+* \param name The name of the operation
+* \param tag The tag to mark the operation
+*
+* \return A Tensor whose op member is the arange operation
+*/
+inline Tensor arange(const Expr &start,
+    const Expr &stop, const Expr &step,
+    const Integer &repeat, Type dtype,
+    std::string name = "tensor",
+    std::string tag = kElementWise) {
+  Array<Expr> shape;
+  // CHECK_NE(step, 0);
+  shape.push_back((stop - start) / step * repeat);
+  return compute(shape, [&](const Array<Var>& indices) {
+      return cast(dtype, start + (indices[0] / repeat) * step);
+  }, name, tag);
+}
+
 }  // namespace topi
 #endif  // TOPI_ELEMWISE_H_

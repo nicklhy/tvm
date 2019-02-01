@@ -56,3 +56,27 @@ def full_like(x, fill_value):
         The result.
     """
     return cpp.full_like(x, fill_value)
+
+
+def arange(start, stop, step, repeat, dtype):
+    """Construct a vector tensor with values in a range
+
+    Parameters
+    ----------
+    start : int or float
+            The start of interval
+    stop : int or float
+            The stop of interval
+    step : int or float
+            The spacing between values
+    repeat : int
+            number of times to repeat each element
+    dtype : str
+            Data type of the output tensor
+
+    Returns
+    -------
+    y : tvm.Tensor
+        The result.
+    """
+    return cpp.arange(start, stop, step, repeat, dtype)

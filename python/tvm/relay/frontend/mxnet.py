@@ -268,6 +268,19 @@ def _mx_multibox_detection(inputs, attrs):
     return _op.vision.nms(ret[0], ret[1], **new_attrs1)
 
 
+def _mx_arange(inputs, attrs):
+    start = attrs.get_float('start', 0)
+    stop = attrs.get_float('stop', 'None')
+    step = attrs.get_float('step', 1.0)
+    repeat = attrs.get_int('repeat', 1)
+    dtype = attrs.get_str('dtype', 'float32')
+    if step == 0:
+        raise ValueError('step can not be 0 in operator arange!')
+    if repeat <= 0:
+        raise ValueError('repeat must be greater than 0!')
+    return _op.tensor.arange(start, stop, step, repeat, dtype)
+
+
 # Note: due to attribute conversion constraint
 # ops in the identity set must be attribute free
 _identity_list = [
@@ -322,6 +335,7 @@ _convert_map = {
     # init ops
     "_ones"         : _init_op(_op.ones),
     "_zeros"        : _init_op(_op.zeros),
+    "_arange"       : _mx_arange,
     # softmax
     "softmax"       : _softmax_op(_op.nn.softmax),
     "log_softmax"   : _softmax_op(_op.nn.log_softmax),

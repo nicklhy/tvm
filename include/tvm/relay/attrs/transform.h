@@ -163,6 +163,28 @@ struct ClipAttrs : public tvm::AttrsNode<ClipAttrs> {
   }
 };
 
+/*! \brief Attributes for Arange operator */
+struct ArangeAttrs : public tvm::AttrsNode<ArangeAttrs> {
+  IndexExpr start;
+  IndexExpr stop;
+  IndexExpr step;
+  Integer repeat;
+  DataType dtype;
+
+  TVM_DECLARE_ATTRS(ArangeAttrs, "relay.attrs.ArangeAttrs") {
+  TVM_ATTR_FIELD(start)
+    .describe("The start of interval.");
+  TVM_ATTR_FIELD(stop)
+    .describe("The stop of interval.");
+  TVM_ATTR_FIELD(step)
+    .describe("The spacing between values.");
+  TVM_ATTR_FIELD(repeat)
+    .describe("The repeat number of times to repeat each element.");
+  TVM_ATTR_FIELD(dtype)
+    .describe("The output data type.");
+  }
+};
+
 struct LayoutTransformAttrs : public tvm::AttrsNode<LayoutTransformAttrs> {
   std::string src_layout;
   std::string dst_layout;

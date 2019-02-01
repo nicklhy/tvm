@@ -184,6 +184,11 @@ TVM_REGISTER_GLOBAL("topi.full_like")
   *rv = full_like(args[0], args[1]);
   });
 
+TVM_REGISTER_GLOBAL("topi.arange")
+.set_body([](TVMArgs args, TVMRetValue *rv) {
+  *rv = arange(args[0], args[1], args[2], args[3], args[4]);
+  });
+
 /* Ops from nn.h */
 TVM_REGISTER_GLOBAL("topi.nn.relu")
 .set_body([](TVMArgs args, TVMRetValue *rv) {
